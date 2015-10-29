@@ -26,6 +26,7 @@ public class Archon extends Bot {
 	 * Current move
 	 */
 	private int move = BattleBotArena.UP;
+	private int shootdir;
 	private int dodgethis;
 	/**
 	 * My last location - used for detecting when I am stuck
@@ -53,21 +54,68 @@ public class Archon extends Bot {
 
 	@Override
 	public int getMove(BotInfo me, boolean shotOK, BotInfo[] liveBots, BotInfo[] deadBots, Bullet[] bullets) {
-		//count down the directional shot cooldowns
-		
-		if (bulletdown >0){
-			bulletdown --;
-		}
-		if (bulletright >0){
-			bulletright --;
-		}
-		if (bulletleft >0){
-			bulletleft --;
-		}
-		if (bulletup >0){
-			bulletup --;
-		}
 		//bullet dodging
+		dodgescript(bullets, me);
+		//we are going to have another part that overrides the dodge mechanics if bot is stuck.
+		if (shotOK&&dodgemode==0){//only if not dodging
+			shootdir = move;
+			shootscript(liveBots, me, shotOK);
+			return shootdir;
+		}
+		else {
+			return move;
+		}
+	}
+
+	@Override
+	public void draw(Graphics g, int x, int y) {
+		// TODO Auto-generated method stub
+		g.drawImage(current, x, y, RADIUS*2, RADIUS*2, null);
+	}
+	
+	@Override
+	public String getName() {
+		name = "Archon";
+		return name;
+	}
+
+	@Override
+	public String getTeamName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String outgoingMessage() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void incomingMessage(int botNum, String msg) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public String[] imageNames() {
+		String images[] = {"starfish4.png"};
+		return images;
+	}
+
+	@Override
+	public void loadedImages(Image[] images) {
+		// TODO Auto-generated method stub
+		if (images != null)
+		{
+			current = up = images[0];
+			down = images[0];
+			left = images[0];
+			right = images[0];
+		}
+	}
+	
+	private void dodgescript(Bullet[] bullets, BotInfo me){
 		if (dodgemode == 1) {
 			if(!(bullets[dodgethis].getX()+RADIUS*2 > me.getX() && bullets[dodgethis].getX()-RADIUS*2 < me.getX() 
 					&& bullets[dodgethis].getYSpeed()*(me.getY()-bullets[dodgethis].getY())>0)){
@@ -119,83 +167,50 @@ public class Archon extends Bot {
 				}
 			}
 		}
-		//we are going to have another part that overrides the dodge mechanics if bot is stuck.
-		if (shotOK&&dodgemode==0){//only if not dodging
+	}
+	
+	private void shootscript(BotInfo[] liveBots, BotInfo me, boolean shotOK){
+		if (bulletdown >0){
+			bulletdown --;
+		}
+		if (bulletright >0){
+			bulletright --;
+		}
+		if (bulletleft >0){
+			bulletleft --;
+		}
+		if (bulletup >0){
+			bulletup --;
+		}
 			for(int i = 0; i < liveBots.length; i ++){
 				//this checks if something has same value
 				if (liveBots[i].getX() + 3 > me.getX() && liveBots[i].getX() - RADIUS < me.getX()){
 					if (liveBots[i].getY()-me.getY() > 0 && bulletdown == 0){
 						bulletdown = 10;
-						return BattleBotArena.FIREDOWN;
+						shootdir = BattleBotArena.FIREDOWN;
+						return;
 					}
 					else if (bulletup == 0) {
 						bulletup = 10;
-						return BattleBotArena.FIREUP;
+						shootdir = BattleBotArena.FIREUP;
+						return;
 					}
 				}
 				//
 				else if (liveBots[i].getY() + 3 > me.getY() && liveBots[i].getY() - RADIUS < me.getY()){
 					if (liveBots[i].getX()-me.getX() > 0 && bulletright == 0){
 						bulletright = 10;
-						return BattleBotArena.FIRERIGHT;
+						shootdir = BattleBotArena.FIRERIGHT;
+						return;
 					}
 					else if (bulletleft == 0) {
 						bulletleft = 10;
-						return BattleBotArena.FIRELEFT;
+						shootdir = BattleBotArena.FIRELEFT;
+						return;
 					}
 				}
 			}
-		}
-		
-		return move;
+			
 	}
-
-	@Override
-	public void draw(Graphics g, int x, int y) {
-		// TODO Auto-generated method stub
-		g.drawImage(current, x, y, RADIUS*2, RADIUS*2, null);
-	}
-
-	@Override
-	public String getName() {
-		name = "Archon";
-		return name;
-	}
-
-	@Override
-	public String getTeamName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String outgoingMessage() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void incomingMessage(int botNum, String msg) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public String[] imageNames() {
-		String images[] = {"starfish4.png"};
-		return images;
-	}
-
-	@Override
-	public void loadedImages(Image[] images) {
-		// TODO Auto-generated method stub
-		if (images != null)
-		{
-			current = up = images[0];
-			down = images[0];
-			left = images[0];
-			right = images[0];
-		}
-	}
-
 }
+

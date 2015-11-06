@@ -519,6 +519,139 @@ public class Archon extends Bot {
 		}
 		return false;
 	}
+	private void avoidDeadBot(BotInfo me,BotInfo [] deadBots){
+
+		double dx,dy,adx,ady,d;
+		int dodgemodifier = 5;
+		for (int x =0; x<deadBots.length;x++) {
+			dx = me.getX() - deadBots[x].getX();
+			dy = me.getY() - deadBots[x].getY();
+			adx = Math.abs(dx);
+			ady = Math.abs(dy);
+			d = adx + ady;
+
+			/*
+			 * if within manhattan dsitance (adx+ady)
+			 * then check horizonta alignment
+			 * else check vertical alignment
+			 * if aligned then check if above or below (if dy > 0 bot is below dead)
+			 * then discourage moving closer
+			 * 
+			 */
+			if (d < 50) {
+				/*
+				 * check if its perfect vertical then partial vertical
+				 * then check if its perfect horizontal then partial horizontal
+				 */
+				if (deadBots[x].getX() == me.getX()){//perfect vertical alignment check
+					if (dy > 0){
+						//ai[1]+=5/(ady+0.5);//this is not neccessary but may be included
+						ai[3]+=dodgemodifier/(ady+1);
+						ai[2]+=5/(ady+1);
+						ai[0]-=5/(ady+1);
+					}
+					else {
+						ai[3]+=5/(ady+1);
+						ai[2]+=5/(ady+1);
+						ai[1]-=5/(ady+1);
+					}
+				}
+				else if (deadBots[x].getX()+RADIUS*2 > me.getX() && deadBots[x].getX()-RADIUS*2 < me.getX()){//partial alignment check
+					if (dx > 0){//me is right of bullet
+						if (dy>0){
+							ai[3]+=5/(ady+1);
+							ai[0]-=5/(ady+1);
+							ai[2]+=(5/ady)-(5/Math.abs((ady-RADIUS)/4-(RADIUS*2-adx)/2));//so if bullet is aligned and to the left, encourage a dodge to left but decrease as the time to dodge approaches time to hit
+						}
+						else{
+							ai[3]+=5/(ady+1);
+							ai[1]-=5/(ady+1);
+							ai[2]+=(5/ady)-(5/Math.abs((ady-RADIUS)/4-(RADIUS*2-adx)/2));//so if bullet is aligned and to the left, encourage a dodge to left but decrease as the time to dodge approaches time to hit
+						}
+					}
+					else {
+						if (dy>0){
+							ai[2]+=5/ady;
+							ai[0]-=5/ady;
+							ai[3]+=(5/ady)-(5/Math.abs((ady-RADIUS)/4-(RADIUS*2-adx)/2));//same but right side
+						}
+						else {
+							ai[2]+=5/ady;
+							ai[1]-=5/ady;
+							ai[3]+=(5/ady)-(5/Math.abs((ady-RADIUS)/4-(RADIUS*2-adx)/2));//same but right side
+						}
+					}
+				}
+				/*else {//not aligned
+					if (dx > 0){//me is right of bullet
+						ai[0]-=5/(ady+10);//discourage moving closer on y but only to limit
+						ai[3]+=5/(adx+10)+5/(ady+10);//so encourage moving further as the bullet gets closer but only to a limit
+						ai[2]-=3/(ady+10)+5/(Math.abs(me.getX()-RADIUS-deadBots[x].getX()));//discourage moving closer as y gets closer to a limit but don't move into the bullet
+						//x-radius is the left edge of the bot. x+radius is right edge of bot. y-radius is top edge. y+radius is bottom edge
+					}
+					else {
+						ai[0]-=5/(ady+10);
+						ai[2]+=3/(adx+10)+3/(ady+10);
+						ai[3]-=3/(ady+10)+5/(Math.abs(me.getX()+RADIUS-deadBots[x].getX()));
+					}
+				}*/
+
+				/*else {
+					if (dx > 0){//me is right of bullet/bullet is left of me
+						ai[1]-=5/(ady+1);//discourage moving closer on y but only to limit
+						ai[3]+=3/(adx+10)+3/(ady+10);//so encourage moving further as the bullet gets closer but only to a limit
+						ai[2]-=3/(ady+1)+5/(Math.abs(me.getX()-RADIUS-deadBots[x].getX()));//discourage moving closer as y gets closer to a limit but don't move into the bullet
+					}
+					else {
+						ai[1]-=5/(ady+10);
+						ai[2]+=3/(adx+10)+3/(ady+10);
+						ai[3]-=3/(ady+10)+5/(Math.abs(me.getX()-RADIUS+deadBots[x].getX()));
+					}
+				}*/
+
+				else if (deadBots[x].getY() == me.getY()){
+					if (dx >0){
+						ai[0]+=dodgemodifier/adx;
+						ai[1]+=dodgemodifier/adx;
+						ai[2]-=dodgemodifier/adx;
+					}
+					else{
+						ai[0]+=dodgemodifier/adx;
+						ai[1]+=dodgemodifier/adx;
+						ai[3]-=dodgemodifier/adx;
+					}
+				}
+				else if (deadBots[x].getY()+RADIUS*2 > me.getY() && deadBots[x].getY()-RADIUS*2 < me.getY()){
+					if (dy > 0){//bullet is above me
+						if (dx > 0){
+							ai[1]+=dodgemodifier/adx;
+							ai[2]-=dodgemodifier/adx;
+							ai[0]+=(dodgemodifier/adx)-(dodgemodifier/Math.abs((adx-RADIUS)/4-(RADIUS*2-ady)/2));//so if bullet is aligned and above encourage dodge up but discourage as difference in dodge time and hit time approaches 0
+						}
+						else{
+							ai[1]+=dodgemodifier/adx;
+							ai[3]-=dodgemodifier/adx;
+							ai[0]+=(dodgemodifier/adx)-(dodgemodifier/Math.abs((adx-RADIUS)/4-(RADIUS*2-ady)/2));
+						}
+					}
+					else {//bullet is below me
+						if (dx>0){
+							ai[0]+=dodgemodifier/adx;
+							ai[2]-=dodgemodifier/adx;
+							ai[1]+=(dodgemodifier/adx)-(dodgemodifier/Math.abs((adx-RADIUS)/4-(RADIUS*2-ady)/2));//same but down side
+						}
+						else {
+							ai[0]+=dodgemodifier/adx;
+							ai[3]-=dodgemodifier/adx;
+							ai[1]+=(dodgemodifier/adx)-(dodgemodifier/Math.abs((adx-RADIUS)/4-(RADIUS*2-ady)/2));//same but down side
+						}
+					}
+				}
+			}// ends for loop
+		}
+
+
+	} // ends method 
 
 	private void directionalbulletdodge(Bullet[] bullets, BotInfo me) {
 		double dx, adx, dy, ady, d;

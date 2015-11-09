@@ -547,8 +547,8 @@ public class Archon extends Bot {
 					if (dy > 0){
 						//ai[1]+=5/(ady+0.5);//this is not neccessary but may be included
 						ai[3]+=dodgemodifier/(ady+1);
-						ai[2]+=5/(ady+1);
-						ai[0]-=5/(ady+1);
+						ai[2]+=dodgemodifier/(ady+1);
+						ai[0]-=dodgemodifier/(ady+1);
 					}
 					else {
 						ai[3]+=5/(ady+1);
@@ -559,26 +559,26 @@ public class Archon extends Bot {
 				else if (deadBots[x].getX()+RADIUS*2 > me.getX() && deadBots[x].getX()-RADIUS*2 < me.getX()){//partial alignment check
 					if (dx > 0){//me is right of bullet
 						if (dy>0){
-							ai[3]+=5/(ady+1);
-							ai[0]-=5/(ady+1);
-							ai[2]+=(5/ady)-(5/Math.abs((ady-RADIUS)/4-(RADIUS*2-adx)/2));//so if bullet is aligned and to the left, encourage a dodge to left but decrease as the time to dodge approaches time to hit
+							ai[3]+=dodgemodifier/(ady+1);
+							ai[0]-=dodgemodifier/(ady+1);
+							ai[2]+=(dodgemodifier/ady)-(dodgemodifier/Math.abs((ady-RADIUS)/4-(RADIUS*2-adx)/2));//so if bullet is aligned and to the left, encourage a dodge to left but decrease as the time to dodge approaches time to hit
 						}
 						else{
-							ai[3]+=5/(ady+1);
-							ai[1]-=5/(ady+1);
-							ai[2]+=(5/ady)-(5/Math.abs((ady-RADIUS)/4-(RADIUS*2-adx)/2));//so if bullet is aligned and to the left, encourage a dodge to left but decrease as the time to dodge approaches time to hit
+							ai[3]+=dodgemodifier/(ady+1);
+							ai[1]-=dodgemodifier/(ady+1);
+							ai[2]+=(dodgemodifier/ady)-(dodgemodifier/Math.abs((ady-RADIUS)/4-(RADIUS*2-adx)/2));//so if bullet is aligned and to the left, encourage a dodge to left but decrease as the time to dodge approaches time to hit
 						}
 					}
 					else {
 						if (dy>0){
-							ai[2]+=5/ady;
-							ai[0]-=5/ady;
-							ai[3]+=(5/ady)-(5/Math.abs((ady-RADIUS)/4-(RADIUS*2-adx)/2));//same but right side
+							ai[2]+=dodgemodifier/ady;
+							ai[0]-=dodgemodifier/ady;
+							ai[3]+=(dodgemodifier/ady)-(dodgemodifier/Math.abs((ady-RADIUS)/4-(RADIUS*2-adx)/2));//same but right side
 						}
 						else {
-							ai[2]+=5/ady;
-							ai[1]-=5/ady;
-							ai[3]+=(5/ady)-(5/Math.abs((ady-RADIUS)/4-(RADIUS*2-adx)/2));//same but right side
+							ai[2]+=dodgemodifier/ady;
+							ai[1]-=dodgemodifier/ady;
+							ai[3]+=(dodgemodifier/ady)-(dodgemodifier/Math.abs((ady-RADIUS)/4-(RADIUS*2-adx)/2));//same but right side
 						}
 					}
 				}
@@ -651,7 +651,7 @@ public class Archon extends Bot {
 		}
 
 
-	} // ends method 
+	}
 
 	private void directionalbulletdodge(Bullet[] bullets, BotInfo me) {
 		double dx, adx, dy, ady, d;

@@ -11,6 +11,9 @@ import arena.Bullet;
 public class Archon extends Bot {
 
 	String name;
+	private String[] killMessages = {"Get rekt m8", "Gr8 b8 m8!", "eeeeezzzz", "Psyche!", "Eureka!", "Are you trying?","LEL"};
+	private int msgCounter = 0;
+	private String nextMessage = null;
 	Image up, down, right, left, current;
 	boolean stuck = false;
 	//largest priority
@@ -68,6 +71,19 @@ public class Archon extends Bot {
 
 	@Override
 	public int getMove(BotInfo me, boolean shotOK, BotInfo[] liveBots, BotInfo[] deadBots, Bullet[] bullets) {
+		
+		if (move == 1) {
+			current = up;
+		}
+		else if (move ==2) {
+			current = down;
+		}
+		else if (move ==3) {
+			current = left;
+		}
+		else {
+			current = right;
+		}
 		//bullet dodging
 		/*
 		try{
@@ -84,11 +100,16 @@ public class Archon extends Bot {
 			x = me.getX();
 			y = me.getY();
 		}
-
 		catch (Exception e){
 			System.out.println("error is in stuck");
 		}
 		 */
+		
+		if (--msgCounter == 0)
+		{
+			move = BattleBotArena.SEND_MESSAGE;
+		}
+		
 		ai[0]=0;
 		ai[1]=0;
 		ai[2]=0;
@@ -186,24 +207,31 @@ public class Archon extends Bot {
 	@Override
 	public String getTeamName() {
 		// TODO Auto-generated method stub
-		return null;
+		return "Archon FTW!";
 	}
 
 	@Override
 	public String outgoingMessage() {
-		// TODO Auto-generated method stub
-		return null;
+		String msg = nextMessage;
+		nextMessage = null;
+		return msg;
 	}
 
 	@Override
 	public void incomingMessage(int botNum, String msg) {
-		// TODO Auto-generated method stub
+		if (botNum == BattleBotArena.SYSTEM_MSG && msg.matches(".*destroyed by "+getName()+".*"))
+		{
+			int msgNum = (int)(Math.random()*killMessages.length);
+			nextMessage = killMessages[msgNum];
+			msgCounter = (int)(Math.random()*30 + 30);
+		}
+
 
 	}
 
 	@Override
 	public String[] imageNames() {
-		String images[] = {"starfish4.png"};
+		String images[] = {"Archon_UP.gif","Archon_DOWN.png","Archon_LEFT.png","Archon_RIGHT.png"};
 		return images;
 	}
 
@@ -213,14 +241,15 @@ public class Archon extends Bot {
 		if (images != null)
 		{
 			current = up = images[0];
-			down = images[0];
-			left = images[0];
-			right = images[0];
+			down = images[1];
+			left = images[2];
+			right = images[3];
 		}
+		
+		
+		
 	}
-	private void avoidai(){
 
-	}
 	private void dodgescript(Bullet[] bullets, BotInfo me){
 		if (dodgemode == 1) {
 			try {
@@ -437,7 +466,6 @@ public class Archon extends Bot {
 			//}
 			/*catch (Exception e){
 				System.out.println("error is in s&d variable setting part 2" + " || " + target);
-
 				dx = me.getX()-liveBots[target].getX();//+ is bot----me, - is me----bot
 				adx = Math.abs(dx);
 				dy = me.getY()-liveBots[target].getY();
@@ -1207,4 +1235,3 @@ public class Archon extends Bot {
 			}
 		}
 	}
-}

@@ -116,6 +116,12 @@ public class Archon extends Bot {
 		catch(Exception e){
 			System.out.println("error is in avoidDeadBot");
 		}
+		try{
+			avoidBots(me, liveBots);
+		}
+		catch(Exception e){
+			System.out.println("error in avoid live bots");
+		}
 		
 		
 		try {
@@ -232,7 +238,7 @@ public class Archon extends Bot {
 	}
 	
 	private void shootscript(BotInfo[] liveBots, BotInfo me, boolean shotOK){
-		double dx,adx,dy,ady,angle;
+		double dx,adx,dy,ady,angle,d;
 		if (bulletdown >0){
 			bulletdown --;
 		}
@@ -251,39 +257,43 @@ public class Archon extends Bot {
 			adx = Math.abs(dx);
 			dy = me.getY()-liveBots[i].getY();
 			ady = Math.abs(dy);
+			d = ady+adx;
 			//System.out.println(ady + " " + adx + " " + dy + " "+dx);
+			
 			try {
-				if(adx>ady){
-					angle = Math.tan(ady/adx);
-					if (angle<=firecone || liveBots[i].getY() + RADIUS > me.getY() && liveBots[i].getY() - RADIUS < me.getY()){//liveBots[i].getY() + RADIUS > me.getY() && liveBots[i].getY() - RADIUS < me.getY()){
-						if (dx < 0 && bulletright == 0){
-							bulletright = 15;
-							shootdir = BattleBotArena.FIRERIGHT;
-							//System.out.println("Shooting right at " +liveBots[i].getName()+ " who's distance is = " +dx);
-							return;
-						}
-						else if (dx > 0 && bulletleft == 0) {
-							bulletleft = 15;
-							shootdir = BattleBotArena.FIRELEFT;
-							//System.out.println("Shooting left at " +liveBots[i].getName()+ " who's distance is = " +dx);
-							return;
+				if(d<200){
+					if(adx>ady){
+						angle = Math.tan(ady/adx);
+						if (angle<=firecone || liveBots[i].getY() + RADIUS > me.getY() && liveBots[i].getY() - RADIUS < me.getY()){//liveBots[i].getY() + RADIUS > me.getY() && liveBots[i].getY() - RADIUS < me.getY()){
+							if (dx < 0 && bulletright == 0){
+								bulletright = 15;
+								shootdir = BattleBotArena.FIRERIGHT;
+								//System.out.println("Shooting right at " +liveBots[i].getName()+ " who's distance is = " +dx);
+								return;
+							}
+							else if (dx > 0 && bulletleft == 0) {
+								bulletleft = 15;
+								shootdir = BattleBotArena.FIRELEFT;
+								//System.out.println("Shooting left at " +liveBots[i].getName()+ " who's distance is = " +dx);
+								return;
+							}
 						}
 					}
-				}
-				else {
-					angle = Math.tan(adx/ady);
-					if (angle <= firecone || liveBots[i].getX() + RADIUS > me.getX() && liveBots[i].getX() - RADIUS < me.getX()){//liveBots[i].getX() + RADIUS > me.getX() && liveBots[i].getX() - RADIUS < me.getX()){
-						if (dy < 0 && bulletdown == 0){
-							bulletdown = 15;
-							shootdir = BattleBotArena.FIREDOWN;
-							//System.out.println("Shooting down at " +liveBots[i].getName() + " who's distance is = " +dy);
-							return;
-						}
-						else if (dy > 0 && bulletup == 0) {
-							bulletup = 15;
-							shootdir = BattleBotArena.FIREUP;
-							//System.out.println("Shooting up at " +liveBots[i].getName() + " who's distance is = " +dy);
-							return;
+					else {
+						angle = Math.tan(adx/ady);
+						if (angle <= firecone || liveBots[i].getX() + RADIUS > me.getX() && liveBots[i].getX() - RADIUS < me.getX()){//liveBots[i].getX() + RADIUS > me.getX() && liveBots[i].getX() - RADIUS < me.getX()){
+							if (dy < 0 && bulletdown == 0){
+								bulletdown = 15;
+								shootdir = BattleBotArena.FIREDOWN;
+								//System.out.println("Shooting down at " +liveBots[i].getName() + " who's distance is = " +dy);
+								return;
+							}
+							else if (dy > 0 && bulletup == 0) {
+								bulletup = 15;
+								shootdir = BattleBotArena.FIREUP;
+								//System.out.println("Shooting up at " +liveBots[i].getName() + " who's distance is = " +dy);
+								return;
+							}
 						}
 					}
 				}
@@ -291,6 +301,7 @@ public class Archon extends Bot {
 			catch(Exception e){
 				System.out.print("error is in shootscript");
 			}
+			
 		}
 	}
 	/**
@@ -453,6 +464,106 @@ public class Archon extends Bot {
 	 * Moves away to a certain extend 
 	 * Method only functions if within a manhattan distance of 50
 	 */
+	 private void avoidBots(BotInfo me, BotInfo [] liveBots){
+		double dx,dy,adx,ady,d;
+		
+		for (int x =0; x<liveBots.length;x++) {
+			dx = me.getX() - liveBots[x].getX();
+			dy = me.getY() - liveBots[x].getY();
+			adx = Math.abs(dx);
+			ady = Math.abs(dy);
+			d = adx + ady;
+			if (d < 50 && liveBots[x].getBulletsLeft() > 0) { // When there is ammo on the enemy
+				if (liveBots[x].getX() == me.getX()){//perfect vertical alignment check
+					if (dy > 0){
+						//ai[1]+=5/(ady+40);//this is not neccessary but may be included
+						ai[3]+=dodgemodifier/(ady+30);
+						ai[2]+=dodgemodifier/(ady+30);
+						ai[0]-=dodgemodifier/(ady+30);
+					}
+					else {
+						ai[3]+=dodgemodifier/(ady+30);
+						ai[2]+=dodgemodifier/(ady+30);
+						ai[1]-=dodgemodifier/(ady+30);
+					}
+				}
+				else if (liveBots[x].getX()+RADIUS*2 > me.getX() && liveBots[x].getX()-RADIUS*2 < me.getX()){//partial alignment check
+					if (dx > 0){
+						if (dy>0){
+							ai[3]+=dodgemodifier/(ady+30);
+							ai[0]-=dodgemodifier/(ady+30);
+							ai[2]+=(dodgemodifier/(ady+30))-(dodgemodifier/(Math.abs((ady-RADIUS)/4-(RADIUS+adx)/2)+30));
+							//ai[2]+=((dodgemodifier/2)/ady+40);//so if bullet is aligned and to the left, encourage a dodge to left but decrease as the time to dodge approaches time to hit
+						}
+						else{
+							ai[3]+=dodgemodifier/(ady+30);
+							ai[1]-=dodgemodifier/(ady+30);
+							ai[2]+=(dodgemodifier/(ady+30))-(dodgemodifier/(Math.abs((ady-RADIUS)/4-(RADIUS+adx)/2)+30));
+							//ai[2]+=((dodgemodifier/2)/ady+40);//so if bullet is aligned and to the left, encourage a dodge to left but decrease as the time to dodge approaches time to hit
+						}
+					}
+					else {
+						if (dy>0){
+							ai[2]+=dodgemodifier/(ady+30);
+							ai[0]-=dodgemodifier/(ady+30);
+							ai[3]+=(dodgemodifier/(ady+30))-(dodgemodifier/(Math.abs((ady-RADIUS)/4-(RADIUS+adx)/2)+30));
+							//ai[3]+=((dodgemodifier/2)/ady+40);//same but right side
+						}
+						else {
+							ai[2]+=dodgemodifier/(ady+30);
+							ai[1]-=dodgemodifier/(ady+30);
+							ai[3]+=(dodgemodifier/(ady+30))-(dodgemodifier/(Math.abs((ady-RADIUS)/4-(RADIUS+adx)/2)+30));
+							//ai[3]+=((dodgemodifier/2)/ady+40);//same but right side
+						}
+					}
+				}
+
+				else if (liveBots[x].getY() == me.getY()){
+					if (dx >0){
+						ai[0]+=dodgemodifier/(adx+30);
+						ai[1]+=dodgemodifier/(adx+30);
+						ai[2]-=dodgemodifier/(adx+30);
+					}
+					else{
+						ai[0]+=dodgemodifier/(adx+30);
+						ai[1]+=dodgemodifier/(adx+30);
+						ai[3]-=dodgemodifier/(adx+30);
+					}
+				}
+				else if (liveBots[x].getY()+RADIUS*2 > me.getY() && liveBots[x].getY()-RADIUS*2 < me.getY()){
+					if (dy > 0){//bullet is above me
+						if (dx > 0){
+							ai[1]+=dodgemodifier/(adx+30);
+							ai[2]-=dodgemodifier/(adx+30);
+							ai[0]+=(dodgemodifier/(adx+30))-(dodgemodifier/(Math.abs((adx-RADIUS)/4-(RADIUS+ady)/2)+30));
+							//ai[0]+=((dodgemodifier/2)/adx+40);//so if bullet is aligned and above encourage dodge up but discourage as difference in dodge time and hit time approaches 0
+						}
+						else{
+							ai[1]+=dodgemodifier/(adx+30);
+							ai[3]-=dodgemodifier/(adx+30);
+							ai[0]+=(dodgemodifier/(adx+30))-(dodgemodifier/(Math.abs((adx-RADIUS)/4-(RADIUS+ady)/2)+30));
+							//ai[0]+=((dodgemodifier/2)/adx+40);
+						}
+					}
+					else {//bullet is below me
+						if (dx>0){
+							ai[0]+=dodgemodifier/(adx+30);
+							ai[2]-=dodgemodifier/(adx+30);
+							ai[1]+=(dodgemodifier/(adx+30))-(dodgemodifier/(Math.abs((adx-RADIUS)/4-(RADIUS+ady)/2)+30));
+							//ai[1]+=((dodgemodifier/2)/adx);//same but down side
+						}
+						else {
+							ai[0]+=dodgemodifier/(adx+30);
+							ai[3]-=dodgemodifier/(adx+30);
+							ai[1]+=(dodgemodifier/(adx+30))-(dodgemodifier/(Math.abs((adx-RADIUS)/4-(RADIUS+ady)/2)+30));
+							//ai[1]+=((dodgemodifier/2)/adx);//same but down side
+						}
+					}
+				}
+			}
+		}
+	}
+	 
 	private void avoidDeadBot(BotInfo me,BotInfo [] deadBots){
 		double dx,dy,adx,ady,d;
 		int dodgemodifier = 5;

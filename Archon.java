@@ -123,7 +123,6 @@ public class Archon extends Bot {
 			System.out.println("error in avoid live bots");
 		}
 		
-		
 		try {
 			if (shotOK){//only if not dodging
 				shootdir = -1;
@@ -259,19 +258,22 @@ public class Archon extends Bot {
 			ady = Math.abs(dy);
 			d = ady+adx;
 			//System.out.println(ady + " " + adx + " " + dy + " "+dx);
-			
+			/*
+			 * have an urgency to kill that says if something is close enough, then shorten cooldown
+			 * 
+			 */
 			try {
 				if(d<200){
 					if(adx>ady){
 						angle = Math.tan(ady/adx);
 						if (angle<=firecone || liveBots[i].getY() + RADIUS > me.getY() && liveBots[i].getY() - RADIUS < me.getY()){//liveBots[i].getY() + RADIUS > me.getY() && liveBots[i].getY() - RADIUS < me.getY()){
-							if (dx < 0 && bulletright == 0){
+							if (dx < 0 && (bulletright == 0 || (bulletright == 10 && adx < 50))){
 								bulletright = 15;
 								shootdir = BattleBotArena.FIRERIGHT;
 								//System.out.println("Shooting right at " +liveBots[i].getName()+ " who's distance is = " +dx);
 								return;
 							}
-							else if (dx > 0 && bulletleft == 0) {
+							else if (dx > 0 && (bulletleft == 0 || (bulletleft == 10 && adx < 50))) {
 								bulletleft = 15;
 								shootdir = BattleBotArena.FIRELEFT;
 								//System.out.println("Shooting left at " +liveBots[i].getName()+ " who's distance is = " +dx);
@@ -282,13 +284,13 @@ public class Archon extends Bot {
 					else {
 						angle = Math.tan(adx/ady);
 						if (angle <= firecone || liveBots[i].getX() + RADIUS > me.getX() && liveBots[i].getX() - RADIUS < me.getX()){//liveBots[i].getX() + RADIUS > me.getX() && liveBots[i].getX() - RADIUS < me.getX()){
-							if (dy < 0 && bulletdown == 0){
+							if (dy < 0 && (bulletdown == 0 || (bulletdown == 10 && ady < 50))){
 								bulletdown = 15;
 								shootdir = BattleBotArena.FIREDOWN;
 								//System.out.println("Shooting down at " +liveBots[i].getName() + " who's distance is = " +dy);
 								return;
 							}
-							else if (dy > 0 && bulletup == 0) {
+							else if (dy > 0 && (bulletup == 0 || (bulletup == 10 && ady < 50))) {
 								bulletup = 15;
 								shootdir = BattleBotArena.FIREUP;
 								//System.out.println("Shooting up at " +liveBots[i].getName() + " who's distance is = " +dy);
@@ -327,14 +329,16 @@ public class Archon extends Bot {
 					}
 					//this is for if vertical distance is greater than horizontal
 					else if (Math.tan(adx/ady)<searchcone){//unused right now but it can limit search to a cone
-						if (Math.tan(adx/ady)*(adx+ady)<lowest){//find the product of manhattan distance and angle to pick closest target
+						//the math equation for calculating priority will be
+						//product of manhattan distance and angle and bullets^2
+						if (Math.tan(adx/ady)*(adx+ady) * liveBots[i].getBulletsLeft()<lowest){//find the product of manhattan distance and angle to pick closest target
 							lowest = Math.tan(adx/ady)*(adx+ady);
 							target = i;
 						}
 					}
 					//this is for horizontal > vertcal
 					else if (Math.tan(ady/adx)<searchcone) {
-						if (Math.tan(ady/adx)*(adx+ady)<lowest){
+						if (Math.tan(ady/adx)*(adx+ady) * liveBots[i].getBulletsLeft()<lowest){
 							lowest = Math.tan(ady/adx)*(adx+ady);
 							target = i;
 						}
@@ -355,7 +359,6 @@ public class Archon extends Bot {
 			//}
 			/*catch (Exception e){
 				System.out.println("error is in s&d variable setting part 2" + " || " + target);
-
 				dx = me.getX()-liveBots[target].getX();//+ is bot----me, - is me----bot
 				adx = Math.abs(dx);
 				dy = me.getY()-liveBots[target].getY();
@@ -459,12 +462,7 @@ public class Archon extends Bot {
 		}
 		return false;
 	}
-	/**
-	 * Loops through all the deadbots and compares position of the deadbots to the bot
-	 * Moves away to a certain extend 
-	 * Method only functions if within a manhattan distance of 50
-	 */
-	 private void avoidBots(BotInfo me, BotInfo [] liveBots){
+	private void avoidBots(BotInfo me, BotInfo [] liveBots){
 		double dx,dy,adx,ady,d;
 		
 		for (int x =0; x<liveBots.length;x++) {
@@ -563,10 +561,13 @@ public class Archon extends Bot {
 			}
 		}
 	}
-	 
+	/**
+	 * Loops through all the deadbots and compares position of the deadbots to the bot
+	 * Moves away to a certain extend 
+	 * Method only functions if within a manhattan distance of 50
+	 */
 	private void avoidDeadBot(BotInfo me,BotInfo [] deadBots){
 		double dx,dy,adx,ady,d;
-		int dodgemodifier = 5;
 		
 		for (int x =0; x<deadBots.length;x++) {
 			dx = me.getX() - deadBots[x].getX();
@@ -679,7 +680,7 @@ public class Archon extends Bot {
 					}
 				}
 			}// ends if condiiton of less than 50
-			else { // When there is ammo on the deadbots
+			else if (d < 50) { // When there is ammo on the deadbots
 				
 				if (deadBots[x].getX() == me.getX()){//perfect vertical alignment check
 					if (dy > 0){

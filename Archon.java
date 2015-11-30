@@ -188,6 +188,8 @@ public class Archon extends Bot {
      * print greatest average kills "Greatest aggression n: dodgemodifier m: kills: avg"
 	 */
 	
+	//consider increasing aggression after some time
+	
 	@Override
 	public void draw(Graphics g, int x, int y) {
 		// TODO Auto-generated method stub
@@ -592,90 +594,90 @@ public class Archon extends Bot {
 				 */
 				if (deadBots[x].getX() == me.getX()){//perfect vertical alignment check
 					if (dy > 0){
-						ai[1]+=dodgemodifier/(ady+40);//this is not neccessary but may be included
-						//ai[3]+=dodgemodifier/(ady+40);
-						//ai[2]+=dodgemodifier/(ady+40);
+						ai[1]+=dodgemodifier/(ady+50);//this is not neccessary but may be included
+						ai[3]+=dodgemodifier/(ady+50);
+						ai[2]+=dodgemodifier/(ady+50);
 						ai[0]-=dodgemodifier/(ady+40);
 					}
 					else {
-						//ai[3]+=dodgemodifier/(ady+40);
-						//ai[2]+=dodgemodifier/(ady+40);
+						ai[3]+=dodgemodifier/(ady+50);
+						ai[2]+=dodgemodifier/(ady+50);
 						ai[1]-=dodgemodifier/(ady+40);
-						ai[0]+=dodgemodifier/(ady+40);
+						ai[0]+=dodgemodifier/(ady+50);
 					}
 				}
-				else if (deadBots[x].getX()+RADIUS*2 > me.getX() && deadBots[x].getX()-RADIUS*2 < me.getX()){//partial alignment check
+				else if (deadBots[x].getX()+RADIUS*2.1 > me.getX() && deadBots[x].getX()-RADIUS*2.1 < me.getX()){//partial alignment check
 					if (dx > 0){//me is right of bullet
 						if (dy>0){
-							//ai[3]+=aggression/(ady+40);
+							ai[3]+=dodgemodifier/(ady+50);
 							ai[0]-=dodgemodifier/(ady+40);
-							ai[1]+=dodgemodifier/(ady+40);
-							//ai[2]+=((dodgemodifier/2)/ady+40);//so if bullet is aligned and to the left, encourage a dodge to left but decrease as the time to dodge approaches time to hit
+							ai[1]+=dodgemodifier/(ady+50);
+							ai[2]+=dodgemodifier/(ady+60);//so if bullet is aligned and to the left, encourage a dodge to left but decrease as the time to dodge approaches time to hit
 						}
 						else{
-							//ai[3]+=aggression/(ady+40);
+							ai[3]+=dodgemodifier/(ady+50);
 							ai[1]-=dodgemodifier/(ady+40);
-							ai[0]+=dodgemodifier/(ady+40);
-							//ai[2]+=((dodgemodifier/2)/ady+40);//so if bullet is aligned and to the left, encourage a dodge to left but decrease as the time to dodge approaches time to hit
+							ai[0]+=dodgemodifier/(ady+50);
+							ai[2]+=dodgemodifier/(ady+60);//so if bullet is aligned and to the left, encourage a dodge to left but decrease as the time to dodge approaches time to hit
 						}
 					}
 					else {
 						if (dy>0){
-							//ai[2]+=aggression/(ady+40);
+							ai[2]+=dodgemodifier/(ady+50);
 							ai[0]-=dodgemodifier/(ady+40);
-							ai[1]+=dodgemodifier/(ady+40);
-							//ai[3]+=((dodgemodifier/2)/ady+40);//same but right side
+							ai[1]+=dodgemodifier/(ady+50);
+							ai[3]+=dodgemodifier/(ady+60);//same but right side
 						}
 						else {
-							//ai[2]+=aggression/(ady+40);
+							ai[2]+=dodgemodifier/(ady+50);
 							ai[1]-=dodgemodifier/(ady+40);
-							ai[0]+=dodgemodifier/(ady+40);
-							//ai[3]+=((dodgemodifier/2)/ady+40);//same but right side
+							ai[0]+=dodgemodifier/(ady+50);
+							ai[3]+=dodgemodifier/(ady+60);//same but right side
 						}
 					}
 				}
 				
 				else if (deadBots[x].getY() == me.getY()){
 					if (dx >0){
-						//ai[0]+=dodgemodifier/(adx+40);
-						//ai[1]+=dodgemodifier/(adx+40);
+						ai[0]+=dodgemodifier/(adx+50);
+						ai[1]+=dodgemodifier/(adx+50);
 						ai[2]-=dodgemodifier/(adx+40);
-						ai[3]+=dodgemodifier/(adx+40);
+						ai[3]+=dodgemodifier/(adx+50);
 					}
 					else{
-						//ai[0]+=dodgemodifier/(adx+40);
-						//ai[1]+=dodgemodifier/(adx+40);
+						ai[0]+=dodgemodifier/(adx+50);
+						ai[1]+=dodgemodifier/(adx+50);
 						ai[3]-=dodgemodifier/(adx+40);
-						ai[2]+=dodgemodifier/(adx+40);
+						ai[2]+=dodgemodifier/(adx+50);
 					}
 				}
-				else if (deadBots[x].getY()+RADIUS*2 > me.getY() && deadBots[x].getY()-RADIUS*2 < me.getY()){
+				else if (deadBots[x].getY()+RADIUS*2.1 > me.getY() && deadBots[x].getY()-RADIUS*2.1 < me.getY()){
 					if (dy > 0){//bullet is above me
 						if (dx > 0){
-							//ai[1]+=aggression/(adx+40);
+							ai[1]+=dodgemodifier/(adx+50);
 							ai[2]-=dodgemodifier/(adx+40);
-							ai[3]+=dodgemodifier/(adx+40);
-							//ai[0]+=((dodgemodifier/2)/adx+40);//so if bullet is aligned and above encourage dodge up but discourage as difference in dodge time and hit time approaches 0
+							ai[3]+=dodgemodifier/(adx+50);
+							ai[0]+=dodgemodifier/(adx+60);//so if bullet is aligned and above encourage dodge up but discourage as difference in dodge time and hit time approaches 0
 						}
 						else{
-							//ai[1]+=aggression/(adx+40);
+							ai[1]+=dodgemodifier/(adx+50);
 							ai[3]-=dodgemodifier/(adx+40);
-							ai[2]+=dodgemodifier/(adx+40);
-							//ai[0]+=((dodgemodifier/2)/adx+40);
+							ai[2]+=dodgemodifier/(adx+50);
+							ai[0]+=dodgemodifier/(adx+60);
 						}
 					}
 					else {//bullet is below me
 						if (dx>0){
-							//ai[0]+=aggression/(adx+40);
+							ai[0]+=dodgemodifier/(adx+50);
 							ai[2]-=dodgemodifier/(adx+40);
-							ai[3]+=dodgemodifier/(adx+40);
-							//ai[1]+=((dodgemodifier/2)/adx);//same but down side
+							ai[3]+=dodgemodifier/(adx+50);
+							ai[1]+=dodgemodifier/(adx+60);//same but down side
 						}
 						else {
-							//ai[0]+=aggression/(adx+40);
+							ai[0]+=dodgemodifier/(adx+50);
 							ai[3]-=dodgemodifier/(adx+40);
-							ai[2]+=dodgemodifier/(adx+40);
-							//ai[1]+=((dodgemodifier/2)/adx);//same but down side
+							ai[2]+=dodgemodifier/(adx+50);
+							ai[1]+=dodgemodifier/(adx+60);//same but down side
 						}
 					}
 				}
@@ -1320,8 +1322,7 @@ public class Archon extends Bot {
 							if (dx > 0){//me is right of bullet
 								ai[3]+=dodgemodifier/ady;//dodge rihgt
 								ai[0]-=dodgemodifier/ady;//dont move up
-								ai[2]+=(dodgemodifier/ady)-(dodgemodifier/Math.abs((ady-RADIUS)/4-(RADIUS+adx)/2));//so if bullet is aligned and to the left, encourage a dodge to left but decrease as the time to dodge approaches time to hit
-								
+								ai[2]+=(dodgemodifier/ady)-(dodgemodifier/Math.abs((ady-RADIUS)/4-(RADIUS+adx)/2));//so if bullet is aligned and to the left, encourage a dodge to left but decrease as the time to dodge approaches time to hit	
 							}
 							else {
 								ai[2]+=dodgemodifier/ady;//dodge left
